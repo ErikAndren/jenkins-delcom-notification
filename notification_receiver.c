@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define BUFLEN 512
 #define NPACK 10
@@ -15,7 +16,7 @@
 
 int main() {
   struct sockaddr_in si_me, si_other;
-  int s, i;
+  int s;
   socklen_t slen = sizeof(si_other);
   int status;
   char buf[BUFLEN];
@@ -38,7 +39,7 @@ int main() {
     exit(errno);
   }
 
-  for (i = 0; i < NPACK; i++) {
+  while (true) {
     status = recvfrom(s, buf, BUFLEN, 0, &si_other, &slen);
     if (status < 0) {
       printf("Failed to receive data (%d:%s)\n", errno, strerror(errno));
@@ -62,9 +63,6 @@ int main() {
       printf("Found FAILURE. Light red LED\n");
       continue;
     }
-
-    //    printf("Received packet from %s:%d\nData: %s\n\n",
-    //           inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
   }
 
   close(s);
