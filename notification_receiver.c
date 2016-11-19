@@ -19,6 +19,8 @@ int main() {
   socklen_t slen = sizeof(si_other);
   int status;
   char buf[BUFLEN];
+  char *substr;
+
   s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (s < 0) {
     printf("Failed to open socket (%d:%s)\n", errno, strerror(errno));
@@ -43,8 +45,26 @@ int main() {
       exit(errno);
     }
 
-    printf("Received packet from %s:%d\nData: %s\n\n",
-           inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
+    substr = strstr(buf, "STARTED");
+    if (substr != NULL) {
+      printf("Found STARTED. Light yellow LED\n");
+      continue;
+    }
+
+    substr = strstr(buf, "SUCCESS");
+    if (substr != NULL) {
+      printf("Found SUCCESS. Light green LED\n");
+      continue;
+    }
+
+    substr = strstr(buf, "FAILURE");
+    if (substr != NULL) {
+      printf("Found FAILURE. Light red LED\n");
+      continue;
+    }
+
+    //    printf("Received packet from %s:%d\nData: %s\n\n",
+    //           inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port), buf);
   }
 
   close(s);
